@@ -2,11 +2,16 @@
     <div class="pa-3">
         <div>
             <span class="text-h4">{{subject.subject_id}}</span>
+        </div>
+        <div>
             <v-chip
+                v-for="version in subject.all_versions" 
+                :key="version"
+                :to="{ name: 'Subject', params: { id: subject.subject_id, version: version }}"
                 class="ma-2"
-                color="primary"
+                active-class="primary"
             >
-            {{subject.version}}
+                {{version}}
             </v-chip>
         </div>
         <v-data-table

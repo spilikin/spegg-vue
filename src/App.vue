@@ -71,6 +71,7 @@
       <SubjectsNavigation/>
     </v-navigation-drawer>
 
+<!--
     <v-navigation-drawer
       app
       clipped
@@ -88,11 +89,12 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-
+-->
     <v-main>
       <router-view/>
     </v-main>
 
+<!--
     <v-footer
       app
       color="transparent"
@@ -108,6 +110,7 @@
         solo
       ></v-text-field>
     </v-footer>
+-->
   </v-app>
 </template>
 
