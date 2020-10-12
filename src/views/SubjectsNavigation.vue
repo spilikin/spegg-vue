@@ -68,6 +68,7 @@ export default class SubjectsNavigation extends Vue {
         this.subjects = response.data
       })
       .catch((e) => {
+        this.$emit('errorOccured', e)
         console.log(e);
       });
   }

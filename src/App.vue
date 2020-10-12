@@ -7,6 +7,7 @@
       flat
       height="72"
     >
+      <v-alert :value="error != ''" type="error" icon="mdi-alert" dismissible>{{error}}</v-alert>
       <v-spacer></v-spacer>
 
       <v-responsive max-width="156">
@@ -34,10 +35,9 @@
       >
         <v-avatar
           class="d-block text-center mx-auto mt-4"
-          color="grey darken-1"
           size="48"
         >
-          <img src="@/assets/logo.svg"/>
+          <img src="@/assets/logo.png"/>
         </v-avatar>
 
         <v-divider class="mx-3 my-5"></v-divider>
@@ -68,7 +68,7 @@
 
       </v-navigation-drawer>
 
-      <SubjectsNavigation/>
+      <SubjectsNavigation v-on:errorOccured="error = $event"/>
     </v-navigation-drawer>
 
 <!--
@@ -124,6 +124,7 @@ import SubjectsNavigation from '@/views/SubjectsNavigation.vue';
   },
 })
 export default class App extends Vue {
+  private error = "";
   private drawer = true;
 }
 </script>
