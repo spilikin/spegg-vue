@@ -7,7 +7,7 @@
       flat
       height="72"
     >
-      <v-alert :value="error != ''" type="error" icon="mdi-alert" dismissible>{{error}}</v-alert>
+      <v-alert v-model="showingError" type="error" icon="mdi-alert" dismissible>{{error}}</v-alert>
       <v-spacer></v-spacer>
 
       <v-responsive max-width="156">
@@ -68,7 +68,7 @@
 
       </v-navigation-drawer>
 
-      <SubjectsNavigation v-on:errorOccured="error = $event"/>
+      <SubjectsNavigation v-on:errorOccured="errorOccured($event)"/>
     </v-navigation-drawer>
 
 <!--
@@ -91,7 +91,7 @@
     </v-navigation-drawer>
 -->
     <v-main>
-      <router-view/>
+      <router-view v-on:errorOccured="errorOccured($event)"/>
     </v-main>
 
 <!--
@@ -124,7 +124,13 @@ import SubjectsNavigation from '@/views/SubjectsNavigation.vue';
   },
 })
 export default class App extends Vue {
+  private showingError = false;
   private error = "";
   private drawer = true;
+
+  errorOccured(error: string) {
+    this.error = error;
+    this.showingError = true;
+  }
 }
 </script>
