@@ -2,3 +2,4 @@ node_modules
 staging
 dist
 node_modules
+src/assets/.DS_Store
