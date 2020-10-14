@@ -32,13 +32,28 @@
             class="elevation-1 ma-3"
             >
             
-            <template v-slot:top>
-                <v-text-field
-                v-model="searchResources"
-                label="Search"
-                class="mx-4"
-                ></v-text-field>
-            </template>
+                <template v-slot:item.requirements_count="{ item }">
+                <v-chip
+                    class="ma-2"
+                    color="orange"
+                    outlined
+                >
+                    {{ item.requirements_count }}
+                </v-chip>
+                </template>
+
+                <template v-slot:item.resource.id="{ item }">
+                    <a v-if="item.url.startsWith('http')" target="_blank" :href="item.url">{{ item.resource.id }}</a>
+                    <span v-else>{{ item.resource.id }}</span>
+                </template>
+
+                <template v-slot:top>
+                    <v-text-field
+                    v-model="searchResources"
+                    label="Search"
+                    class="mx-4"
+                    ></v-text-field>
+                </template>
 
             </v-data-table>
         </div>
