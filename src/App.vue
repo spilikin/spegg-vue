@@ -1,6 +1,33 @@
 <template>
-  <v-app id="inspire">
+  <v-app>
+  <v-navigation-drawer app width="325">
+    <SubjectsNavigation v-on:errorOccured="errorOccured($event)"/>
+  </v-navigation-drawer>
 
+  <v-app-bar app>
+    <v-spacer/>
+    <span class="font-weight-black">Spegg</span>
+    <v-avatar
+      class="d-block text-center mx-auto mt-4"
+      size="48"
+    >
+      <img src="@/assets/logo.png"/>
+    </v-avatar>
+  </v-app-bar>
+
+  <v-main>
+    <v-container fluid>
+      <router-view></router-view>
+    </v-container>
+  </v-main>
+
+  <v-footer app>
+    <!-- -->
+  </v-footer>
+</v-app>
+
+  <!--
+  <v-app id="inspire">
     <v-app-bar
       app
       clipped-right
@@ -71,47 +98,12 @@
       <SubjectsNavigation v-on:errorOccured="errorOccured($event)"/>
     </v-navigation-drawer>
 
-<!--
-    <v-navigation-drawer
-      app
-      clipped
-      right
-    >
-      <v-list>
-        <v-list-item
-          v-for="n in 5"
-          :key="n"
-          link
-        >
-          <v-list-item-content>
-            <v-list-item-title>Item {{ n }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
--->
     <v-main>
       <router-view v-on:errorOccured="errorOccured($event)"/>
     </v-main>
 
-<!--
-    <v-footer
-      app
-      color="transparent"
-      height="72"
-      inset
-    >
-      <v-text-field
-        background-color="grey lighten-1"
-        dense
-        flat
-        hide-details
-        rounded
-        solo
-      ></v-text-field>
-    </v-footer>
--->
   </v-app>
+  -->
 </template>
 
 <script lang="ts">

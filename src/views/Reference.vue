@@ -5,9 +5,8 @@
                 :items="breadcrumbs()"
                 divider="/"
             ></v-breadcrumbs>            
-            <div>
-            <span class="text-h4">{{reference.title}}</span>
-            </div>
+            <p class="text-h4">Anforderungen an <b>{{reference.referred_by.subject_id}} v{{reference.referred_by.subject_version}}</b> </p>
+            <p class="text-h5">Quelle: <a target="_blank" :href="reference.url">{{reference.resource_id}} v{{reference.version}}</a> </p>
 
             <v-card
             v-for="(req, i) in reference.requirements"
@@ -55,7 +54,7 @@ export default class ReferenceView extends Vue {
           to: '/',
         })
         items.push({
-          text: this.reference.referred_by.subject_id,
+          text: this.reference.referred_by.subject_id + " v" + this.reference.referred_by.subject_version,
           exact: true,
           to: 
             {
