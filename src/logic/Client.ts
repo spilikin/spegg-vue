@@ -14,4 +14,7 @@ export default class APIClient {
     getSubjectVersion(id: string, version: string) {
         return http.get(`/Subject/${id}/${version}`)
     }
+    getReference(subjectId: string, subjectVersion: string, resourceId: string) {
+        return http.get(`/Reference/${subjectId}/${subjectVersion}/${resourceId}`)
+    }
 }

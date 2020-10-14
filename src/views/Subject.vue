@@ -6,8 +6,12 @@
             type="list-item-avatar, divider, list-item-three-line, card-heading, image, actions"
         ></v-skeleton-loader>
         <div v-if="subject">
+            <v-breadcrumbs
+                :items="breadcrumbs()"
+                divider="/"
+            ></v-breadcrumbs>
             <div>
-                <span class="text-h4">{{subject.subject_id}}</span>
+                <span class="text-h4">{{subject.title}}</span>
             </div>
             <div>
                 <v-chip
@@ -34,11 +38,17 @@
             
                 <template v-slot:item.requirements_count="{ item }">
                 <v-chip
-                    class="ma-2"
+                    class="ma-2 pill"
                     color="orange"
                     outlined
+                    pill
+                    :to="{ name: 'Reference', params: { 
+                        subject_id: subject.subject_id, 
+                        subject_version:  subject.version,
+                        resource_id: item.resource.id
+                    }}"
                 >
-                    {{ item.requirements_count }}
+                    {{ item.requirements_count }} Requirements
                 </v-chip>
                 </template>
 
@@ -78,14 +88,14 @@ export default class SubjectView extends Vue {
     private versions: string[] = []
     private resourcesHeaders = [  {
           text: 'Reference',
-          value: 'resource.description',
+          value: 'resource.title',
         },
         {
           text: 'Resource',
           value: 'resource.id',
         },
         {
-          text: 'Reqs',
+          text: 'Requirements',
           value: 'requirements_count',
         },
         {
@@ -100,7 +110,6 @@ export default class SubjectView extends Vue {
         api.getSubjectVersion(this.$route.params.id, this.$route.params.version).then((response) => {
             this.subject = response.data
             this.versions = this.subject.all_versions.sort()
-            console.log(this.subject)
         })
         .catch((e) => {
             this.$emit('errorOccured', e.message)
@@ -108,5 +117,23 @@ export default class SubjectView extends Vue {
         });
     }
 
+    breadcrumbs() {
+        const items = []
+        items.push({
+          text: 'Home',
+          to: '/',
+        })
+        items.push({
+          text: this.subject.subject_id,
+          to: '/Subject/'+this.subject.subject_id,
+        })
+        return items;
+    }
+
 }
 </script>
+<style scoped>
+.pill {
+    min-width: 4em;
+}
+</style>
