@@ -44,7 +44,7 @@
 
      <v-list-group
         :value="false"
-        prepend-icon="mdi-domain"
+        prepend-icon="mdi-server-security"
       >
         <template v-slot:activator>
           <v-list-item-title>Produkttypen</v-list-item-title>
@@ -81,6 +81,8 @@ import APIClient from '@/logic/Client'
 const api = new APIClient()
 
 interface Subject {
+    type: string;
+    title: string;
     id: string;
 }
 
@@ -121,8 +123,11 @@ export default class SubjectsNavigation extends Vue {
 
   filteredSubjects(type: string) {
     return this.subjects.filter(subject => {
-      return subject.id.toLowerCase().includes(this.search.toLowerCase()) && subject.type == type;
+      return (subject.id.toLowerCase().includes(this.search.toLowerCase())
+                || subject.title.toLowerCase().includes(this.search.toLowerCase()) )
+        && subject.type == type
     })
   }
+
 }
 </script>

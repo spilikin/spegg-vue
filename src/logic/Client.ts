@@ -11,10 +11,18 @@ export default class APIClient {
     getAllSubjects() {
         return http.get('/Subject')
     }
-    getSubjectVersion(id: string, version: string) {
-        return http.get(`/Subject/${id}/${version}`)
+    getSubjectVersion(id: string, version: string, compareVersion?: string) {
+        if (compareVersion) {
+            return http.get(`/Subject/${id}/${version}?compare=${compareVersion}`)
+        } else {
+            return http.get(`/Subject/${id}/${version}`)
+        }
     }
-    getReference(subjectId: string, subjectVersion: string, resourceId: string) {
-        return http.get(`/Reference/${subjectId}/${subjectVersion}/${resourceId}`)
+    getReference(subjectId: string, subjectVersion: string, resourceId: string, compareVersion?: string) {
+        if (compareVersion) {
+            return http.get(`/Reference/${subjectId}/${subjectVersion}/${resourceId}?compare=${compareVersion}`)
+        } else {
+            return http.get(`/Reference/${subjectId}/${subjectVersion}/${resourceId}`)
+        }
     }
 }
