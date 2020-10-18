@@ -91,7 +91,8 @@
             <v-card-title>{{req.id}} {{req.title}}</v-card-title>
             <v-card-text>
                 <div v-html='req.html'/>
-                <div v-if="req.diff != null && req.diff.type == 'Changed'" v-html='req.diff.changes.html'/>
+
+                <div class="RemovedText" v-if="req.diff != null && req.diff.type == 'Changed'" v-html='req.diff.changes.html'/>
             </v-card-text>
 
             </v-card>
@@ -192,7 +193,9 @@ export default class ReferenceView extends Vue {
     }
 
     compare() {
-        if (this.$route.query['compare'] != this.compareVersion) {
+        console.log(this.subject.version)
+        if (this.$route.query['compare'] != this.compareVersion 
+            || this.subject.version != this.$route.params.subject_version) {
             this.$router.push({ 
                 name: 'Reference', 
                 params: { 
@@ -210,7 +213,6 @@ export default class ReferenceView extends Vue {
     requirementClasses(req: any) {
         //{ 'blue lighten-4': anchor() == req.id }
 
-        console.log(req)
       if (req.diff == null) {
         return ''
       } else if (req.diff.type == 'Removed' ) {
@@ -224,3 +226,9 @@ export default class ReferenceView extends Vue {
 
 }
 </script>
+<style scoped>
+.RemovedText {
+    color: red;
+    text-decoration: line-through;
+}
+</style>

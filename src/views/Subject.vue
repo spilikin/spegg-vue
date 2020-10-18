@@ -79,6 +79,7 @@
                     color="orange"
                     outlined
                     pill
+                    
                     v-if="item.requirements_count > 0"
                     :to="{ name: 'Reference', params: { 
                         subject_id: subject.subject_id, 
@@ -87,6 +88,9 @@
                     }}"
                 >
                     {{ item.requirements_count }} Requirements
+                    <v-icon right>
+                        mdi-chevron-right
+                    </v-icon>
                 </v-chip>
                 </template>
 
