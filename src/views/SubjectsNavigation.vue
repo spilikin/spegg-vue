@@ -1,5 +1,5 @@
 <template>
-  <div class="pl-14">
+  <div>
       <v-sheet
         color="grey lighten-5"
         width="100%"
@@ -14,6 +14,14 @@
       
       </v-sheet>
 
+     <v-list-group
+        :value="false"
+        prepend-icon="mdi-domain"
+      >
+        <template v-slot:activator>
+          <v-list-item-title>Anbieter</v-list-item-title>
+        </template>
+
       <v-list dense>
         <v-list-item-group
           v-model="subject"
@@ -21,19 +29,48 @@
           shaped
         >
           <v-list-item
-            v-for="(subject, i) in filteredSubjects()"
+            v-for="(subject, i) in filteredSubjects('Provider')"
             :key="i"
             :to="{ name: 'Subject', params: { id: subject.id, version: subject.latest_version }}"
           >
-            <v-list-item-icon>
-              <v-icon v-text="icon(subject)"></v-icon>
-            </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title v-text="subject.id"></v-list-item-title>
+              <v-list-item-title v-text="subject.title"></v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
       </v-list>
+
+     </v-list-group>
+
+     <v-list-group
+        :value="false"
+        prepend-icon="mdi-server-security"
+      >
+        <template v-slot:activator>
+          <v-list-item-title>Produkttypen</v-list-item-title>
+        </template>
+
+      <v-list dense>
+        <v-list-item-group
+          v-model="subject"
+          color="primary"
+          shaped
+          active='false'
+        >
+          <v-list-item
+            v-for="(subject, i) in filteredSubjects('Product')"
+            :key="i"
+            :to="{ name: 'Subject', params: { id: subject.id, version: subject.latest_version }}"
+          >
+            <v-list-item-content>
+              <v-list-item-title v-text="subject.title"></v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+
+     </v-list-group>
+
   </div>
 </template>
 
@@ -44,6 +81,8 @@ import APIClient from '@/logic/Client'
 const api = new APIClient()
 
 interface Subject {
+    type: string;
+    title: string;
     id: string;
 }
 
@@ -65,6 +104,7 @@ export default class SubjectsNavigation extends Vue {
 
   mounted() {
     api.getAllSubjects().then((response) => {
+        const regex = /^\S+\s+(.+)$/
         this.subjects = response.data
       })
       .catch((e) => {
@@ -81,10 +121,13 @@ export default class SubjectsNavigation extends Vue {
     }
   }
 
-  filteredSubjects() {
+  filteredSubjects(type: string) {
     return this.subjects.filter(subject => {
-      return subject.id.toLowerCase().includes(this.search.toLowerCase());
+      return (subject.id.toLowerCase().includes(this.search.toLowerCase())
+                || subject.title.toLowerCase().includes(this.search.toLowerCase()) )
+        && subject.type == type
     })
   }
+
 }
 </script>
