@@ -25,4 +25,7 @@ export default class APIClient {
             return http.get(`/Reference/${subjectId}/${subjectVersion}/${resourceId}`)
         }
     }
+    getAllResources() {
+        return http.get('/Resource')
+    }
 }

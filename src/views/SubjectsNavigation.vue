@@ -15,7 +15,7 @@
       </v-sheet>
 
      <v-list-group
-        :value="false"
+        :value="providersOpen"
         prepend-icon="mdi-domain"
       >
         <template v-slot:activator>
@@ -43,7 +43,7 @@
      </v-list-group>
 
      <v-list-group
-        :value="false"
+        :value="productsOpen"
         prepend-icon="mdi-server-security"
       >
         <template v-slot:activator>
@@ -101,6 +101,8 @@ export default class SubjectsNavigation extends Vue {
   private subjects: Array<Subject> = []
   private search = ""
   private subject = ""
+  private productsOpen = false
+  private providersOpen = false
 
   mounted() {
     api.getAllSubjects().then((response) => {
@@ -122,6 +124,10 @@ export default class SubjectsNavigation extends Vue {
   }
 
   filteredSubjects(type: string) {
+    if (this.search.trim() != "") {
+      this.productsOpen = true
+      this.providersOpen = true
+    }
     return this.subjects.filter(subject => {
       return (subject.id.toLowerCase().includes(this.search.toLowerCase())
                 || subject.title.toLowerCase().includes(this.search.toLowerCase()) )

@@ -85,7 +85,10 @@
                         subject_id: subject.subject_id, 
                         subject_version:  subject.version,
                         resource_id: item.resource.id
-                    }}"
+                        },
+                        query: {compare: compareVersion}
+                        
+                    }"
                 >
                     {{ item.requirements_count }} Requirements
                     <v-icon right>
