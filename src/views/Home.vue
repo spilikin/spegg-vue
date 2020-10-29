@@ -72,12 +72,18 @@ import APIClient from '@/logic/Client'
 
 const api = new APIClient()
 
+interface Subject {
+    type: string;
+    title: string;
+    id: string;
+}
+
 @Component({
   components: {
   },
 })
 export default class Home extends Vue {
-  private subjects = []
+  private subjects = Array<Subject>()
   private resources = []
   private activeTab = "products"
   private searchSubjects = ""
