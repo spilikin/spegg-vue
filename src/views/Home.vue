@@ -2,6 +2,8 @@
     <div class="pa-3">
       <div class="text-h3">Specification Navigator</div>
 
+
+
       <v-tabs v-model="activeTab">
         <v-tab v-for="title in ['Products', 'Providers']" :key="title">{{title}}</v-tab>
         <v-tab>Resources</v-tab>
@@ -11,11 +13,10 @@
         <v-tab-item v-for="type in ['Product', 'Provider']" :key="type">
           <v-card>
             <v-card-title>
-              <v-layout row>
-                  <v-row>
+              <v-container>
+                  <v-row no-gutters>
                     <v-col>        
                       <v-switch
-                        class="d-flex flex-row"
                         dense
                         light
                         prepend-icon="mdi-clock-outline"
@@ -27,7 +28,6 @@
                     </v-col>
                     <v-col>
                       <v-switch
-                        class="d-flex flex-row"
                         right
                         v-model="showValidActive"
                         color="blue"
@@ -37,7 +37,6 @@
                     </v-col>
                     <v-col>
                       <v-switch
-                        class="d-flex flex-row"
                         right
                         v-model="showValidFrozen"
                         color="blue"
@@ -47,7 +46,6 @@
                     </v-col>
                     <v-col>
                       <v-switch
-                        class="d-flex flex-row"
                         right
                         v-model="showInvalid"
                         color="gray"
@@ -55,9 +53,12 @@
                         label="Invalid versions"
                       ></v-switch>
                     </v-col>
-                  </v-row>
-                  <v-row>
                     <v-col>
+                      <v-spacer/>
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col cols="12">
                       <v-text-field
                         v-model="searchSubjects"
                         append-icon="mdi-magnify"
@@ -67,7 +68,8 @@
                       ></v-text-field>
                     </v-col>
                   </v-row>
-              </v-layout>
+              </v-container>
+
             </v-card-title>
 
             <v-data-table
@@ -81,6 +83,13 @@
             sort-by="id"
             class="ma-3"
             >
+
+              <template v-slot:item.id="{ item }">
+                <router-link :to="{ name: 'Subject', params: { id: item.id, version: item.latest_version }}">
+                {{item.id}}
+                </router-link>
+                        
+              </template>
               <template v-slot:item.versions="{ item }">
                 <table>
                   <tr>
