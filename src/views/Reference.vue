@@ -1,6 +1,7 @@
 <template>
     <div class="pa-3">
         <div v-if='reference'>
+
             <v-breadcrumbs
                 :items="breadcrumbs()"
                 divider="/"
@@ -83,6 +84,7 @@
 
 
             <v-card
+            :id="req.id"
             v-for="(req, i) in reference.requirements"
             :ref="req.id"
             :key="i"
@@ -137,6 +139,9 @@ export default class ReferenceView extends Vue {
         })
         .then((response) => {
             this.reference = response.data;
+            this.$nextTick(() => {
+                this.goto(this.anchor())
+            });
         })
         .catch((e) => {
             this.$emit('errorOccured', e.message)
@@ -193,7 +198,6 @@ export default class ReferenceView extends Vue {
     }
 
     compare() {
-        console.log(this.subject.version)
         if (this.$route.query['compare'] != this.compareVersion 
             || this.subject.version != this.$route.params.subject_version) {
             this.$router.push({ 
@@ -211,18 +215,33 @@ export default class ReferenceView extends Vue {
     }
 
     requirementClasses(req: any) {
-        //{ 'blue lighten-4': anchor() == req.id }
+        if (this.anchor().endsWith(req.id)) {
+            return 'blue lighten-4'
+        } else if (req.diff == null) {
+            return ''
+        } else if (req.diff.type == 'Removed' ) {
+            return 'red lighten-5 Removed'
+        } else if (req.diff.type == 'Changed' ) {
+            return 'yellow lighten-4 Changed'
+        } else if (req.diff.type == 'Added' ) {
+            return 'green lighten-4'
+        }
+    }
 
-      if (req.diff == null) {
-        return ''
-      } else if (req.diff.type == 'Removed' ) {
-          return 'red lighten-5 Removed'
-      } else if (req.diff.type == 'Changed' ) {
-          return 'yellow lighten-4 Changed'
-      } else if (req.diff.type == 'Added' ) {
-          return 'green lighten-4'
-      }
-  }
+    goto(anchor: string) {
+        if (!anchor.startsWith('#')) {
+            return
+        }
+
+        const req = anchor.substring(1)
+
+        if (!(req in this.$refs)) {
+            return
+        }
+
+        const refs = this.$refs[req] as Array<Vue>
+        this.$vuetify.goTo(refs[0])
+    }
 
 }
 </script>

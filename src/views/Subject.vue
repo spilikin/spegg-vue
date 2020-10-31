@@ -80,7 +80,7 @@
                     outlined
                     pill
                     
-                    v-if="item.requirements_count > 0"
+                    v-if="item.requirements_count > 0 && !(item.diff && (item.diff.type == 'Removed' || item.diff.type == 'Added'))"
                     :to="{ name: 'Reference', params: { 
                         subject_id: subject.subject_id, 
                         subject_version:  subject.version,
@@ -106,7 +106,7 @@
                 </template>
                 <template v-slot:item.version="{ item }">
                     <span :class="{'RemovedVersion': item.diff && item.diff.type == 'Removed'}">{{item.version}}</span>
-                    <span v-if="item.diff && item.diff.changes.version" class="RemovedVersion"> {{item.diff.changes.version}}</span>
+                    <span v-if="item.diff && item.diff.changes && item.diff.changes.version" class="RemovedVersion"> {{item.diff.changes.version}}</span>
                 </template>
 
                 <template v-slot:top>
