@@ -77,14 +77,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import APIClient from '@/logic/Client'
+import { SubjectResource } from '@/logic/Resources'
 
 const api = new APIClient()
-
-interface Subject {
-    type: string;
-    title: string;
-    id: string;
-}
 
 @Component({
   components: {
@@ -98,7 +93,7 @@ export default class SubjectsNavigation extends Vue {
           value: 'id',
         },
       ]
-  private subjects: Array<Subject> = []
+  private subjects: Array<SubjectResource> = []
   private search = ""
   private subject = ""
   private productsOpen = false
@@ -115,7 +110,7 @@ export default class SubjectsNavigation extends Vue {
       });
   }
 
-  icon(subject: Subject) {
+  icon(subject: SubjectResource) {
     if (subject.id.startsWith('gemProdT')) {
       return 'mdi-server'
     } else {

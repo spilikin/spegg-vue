@@ -71,6 +71,7 @@
             item-key="subject_id"
             sort-by="subject_id"
             class="elevation-1 ma-3"
+            @click:row="onClickResourceReference"
             >
             
                 <template v-slot:item.requirements_count="{ item }">
@@ -79,16 +80,7 @@
                     color="orange"
                     outlined
                     pill
-                    
-                    v-if="item.requirements_count > 0 && !(item.diff && (item.diff.type == 'Removed' || item.diff.type == 'Added'))"
-                    :to="{ name: 'Reference', params: { 
-                        subject_id: subject.subject_id, 
-                        subject_version:  subject.version,
-                        resource_id: item.resource.id
-                        },
-                        query: {compare: compareVersion}
-                        
-                    }"
+                    v-if="item.requirements_count > 0"
                 >
                     {{ item.requirements_count }} Requirements
                     <v-icon right>
@@ -127,6 +119,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import APIClient from '@/logic/Client'
+import { ReferenceShortResource, SubjectVersionResource } from '@/logic/Resources'
 
 const api = new APIClient()
 
@@ -136,7 +129,7 @@ const api = new APIClient()
 })
 export default class SubjectView extends Vue {
     private searchResources = ""
-    private subject: any = null
+    private subject: SubjectVersionResource | null = null
     private versions: string[] = []
     private compareVersion?: string
 
@@ -164,7 +157,9 @@ export default class SubjectView extends Vue {
         this.compareVersion = this.$route.query.compare as string
         api.getSubjectVersion(this.$route.params.id, this.$route.params.version, this.compareVersion).then((response) => {
             this.subject = response.data
-            this.versions = this.subject.all_versions.sort()
+            if (this.subject != null) {
+                this.versions = this.subject.all_versions.sort()
+            }
         })
         .catch((e) => {
             this.$emit('errorOccured', e.message)
@@ -178,15 +173,17 @@ export default class SubjectView extends Vue {
           text: 'Home',
           to: '/',
         })
-        items.push({
-          text: this.subject.subject_id,
-          to: '/Subject/'+this.subject.subject_id,
-        })
+        if (this.subject != null) {
+            items.push({
+            text: this.subject.subject_id,
+            to: '/Subject/'+this.subject.subject_id,
+            })
+        }
         return items;
     }
 
   compare() {
-      if (this.$route.query['compare'] != this.compareVersion) {
+      if (this.subject != null && this.$route.query['compare'] != this.compareVersion) {
         this.$router.push({
             name: 'Subject', 
             params: {'subject_id': this.subject['subject_id'], version: this.subject.version}, 
@@ -205,6 +202,23 @@ export default class SubjectView extends Vue {
           return 'green lighten-4'
       }
   }
+
+  onClickResourceReference(reference: ReferenceShortResource ) {
+    if (this.subject == null) return;
+    if ( (reference.diff && (reference.diff.type == 'Removed' || reference.diff.type == 'Added') ) ) return;
+    const link = { 
+        name: 'Reference', 
+        params: {
+            'subject_id': this.subject.subject_id, 
+            'subject_version':  this.subject.version,
+            'resource_id': reference.resource.id
+        },
+        query: {
+            compare: this.compareVersion
+        }
+    }
+    this.$router.push(link)
+}
 }
 </script>
 <style scoped>

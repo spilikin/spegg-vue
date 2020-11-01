@@ -28,4 +28,8 @@ export default class APIClient {
     getAllResources() {
         return http.get('/Resource')
     }
+
+    getResourceVersion(resourceId: string, resourceVersion: string) {
+        return http.get(`/Resource/${resourceId}/${resourceVersion}`)
+    }
 }

@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '@/views/Home.vue'
 import Subject from '@/views/Subject.vue'
 import Reference from '@/views/Reference.vue'
+import Resource from '@/views/Resource.vue'
 
 Vue.use(VueRouter)
 
@@ -23,6 +24,12 @@ const routes: Array<RouteConfig> = [
     name: 'Reference',
     props: true, 
     component: Reference
+  },
+  { 
+    path: '/Resource/:resource_id/:resource_version', 
+    name: 'Resource',
+    props: true, 
+    component: Resource
   }
 
 ]

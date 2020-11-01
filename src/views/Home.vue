@@ -5,25 +5,23 @@
 
 
       <v-tabs v-model="activeTab">
-        <v-tab v-for="title in ['Products', 'Providers']" :key="title">{{title}}</v-tab>
-        <v-tab>Resources</v-tab>
+        <v-tab v-for="tab in subjectTabs" :key="tab.type" :to="'#'+tab.type">{{tab.title}}</v-tab>
+        <v-tab to="#Resource">Resources</v-tab>
       </v-tabs>
 
       <v-tabs-items v-model="activeTab">
-        <v-tab-item v-for="type in ['Product', 'Provider']" :key="type">
+        <v-tab-item v-for="tab in subjectTabs" :key="tab.type" :value="tab.type">
           <v-card>
             <v-card-title>
               <v-container>
                   <v-row no-gutters>
                     <v-col>        
                       <v-switch
-                        dense
-                        light
                         prepend-icon="mdi-clock-outline"
                         right
                         v-model="showPending"
                         color="orange"
-                        label="Pending versions"
+                        label="Pending"
                       ></v-switch>
                     </v-col>
                     <v-col>
@@ -32,7 +30,7 @@
                         v-model="showValidActive"
                         color="blue"
                         prepend-icon="mdi-check-decagram"
-                        label="Active versions"
+                        label="Active"
                       ></v-switch>
                     </v-col>
                     <v-col>
@@ -41,7 +39,7 @@
                         v-model="showValidFrozen"
                         color="blue"
                         prepend-icon="mdi-checkbox-blank-circle-outline"
-                        label="Frozen versions"
+                        label="Frozen"
                       ></v-switch>
                     </v-col>
                     <v-col>
@@ -50,7 +48,7 @@
                         v-model="showInvalid"
                         color="gray"
                         prepend-icon="mdi-cancel"
-                        label="Invalid versions"
+                        label="Invalid"
                       ></v-switch>
                     </v-col>
                     <v-col>
@@ -77,7 +75,7 @@
             hide-default-footer
             disable-pagination
             :headers="subjectHeaders"
-            :items="subjectsByType(type)"
+            :items="subjectsByType(tab.type)"
             :search="searchSubjects"
             item-key="id"
             sort-by="id"
@@ -122,7 +120,7 @@
 
         </v-tab-item>
 
-        <v-tab-item>
+        <v-tab-item value="Resource">
           <v-card>
             <v-card-title>
                       <v-text-field
@@ -145,6 +143,14 @@
               sort-by="id"
               class="elevation-1 ma-3"
               >
+
+                <template v-slot:item.id="{ item }">
+                  <router-link :to="{ name: 'Resource', params: { resource_id: item.id, resource_version: item.latest_version }}">
+                  {{item.id}}
+                  </router-link>
+                        
+                </template>
+
                 <template v-slot:item.versions="{ item }">
                   <v-chip 
                     v-for="version in item.versions" 
@@ -152,6 +158,7 @@
                     class="ma-1" 
                     color="primary"
                     outlined
+                    :to="{ name: 'Resource', params: { resource_id: item.id, resource_version: version.version }}"
                   >
                     {{ version.version }}
                   </v-chip>
@@ -166,7 +173,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import APIClient from '@/logic/Client'
 import { SubjectResource, SubjectVersionValidity, SubjectVersionShortResource} from '@/logic/Resources'
 
@@ -180,7 +187,7 @@ const api = new APIClient()
 export default class Home extends Vue {
   private subjects = Array<SubjectResource>()
   private resources = []
-  private activeTab = "products"
+  private activeTab = 'Product'
   private searchSubjects = ""
   private searchResources = ""
   private showPending = true
@@ -217,12 +224,30 @@ export default class Home extends Vue {
     },
   ];
 
+  private subjectTabs = [
+    {
+      title: "Products",
+      type: "Product",
+    },
+    {
+      title: "Providers",
+      type: "Provider",
+    },
+  ]
+
   subjectsByType(type: string) {
     return this.subjects.filter(subject => {
       return (subject.id.toLowerCase().includes(this.searchSubjects.toLowerCase())
                 || subject.title.toLowerCase().includes(this.searchSubjects.toLowerCase()) )
         && subject.type == type
     })
+  }
+
+  @Watch('$route', { immediate: true, deep: true })
+  onRoute() {
+    if (window.location.hash == '#Resources') {
+      this.activeTab = 'Resource'
+    }
   }
 
   mounted() {
