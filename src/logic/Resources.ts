@@ -45,7 +45,7 @@ export interface SubjectVersionResource {
     type: SubjectType;
     validity: SubjectVersionValidity;
     references: Array<ReferenceShortResource>;
-    all_versions: Array<string>;
+    versions: Array<SubjectVersionShortResource>;
 }
 
 

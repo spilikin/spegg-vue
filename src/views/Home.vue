@@ -2,8 +2,6 @@
     <div class="pa-3">
       <div class="text-h3">Specification Navigator</div>
 
-
-
       <v-tabs v-model="activeTab">
         <v-tab v-for="tab in subjectTabs" :key="tab.type" :to="'#'+tab.type">{{tab.title}}</v-tab>
         <v-tab to="#Resource">Resources</v-tab>
@@ -17,7 +15,7 @@
                   <v-row no-gutters>
                     <v-col>        
                       <v-switch
-                        prepend-icon="mdi-clock-outline"
+                        :prepend-icon="subjectVersionValidityIcon('Pending')"
                         right
                         v-model="showPending"
                         color="orange"
@@ -29,7 +27,7 @@
                         right
                         v-model="showValidActive"
                         color="blue"
-                        prepend-icon="mdi-check-decagram"
+                        :prepend-icon="subjectVersionValidityIcon('ValidActive')"
                         label="Active"
                       ></v-switch>
                     </v-col>
@@ -38,7 +36,7 @@
                         right
                         v-model="showValidFrozen"
                         color="blue"
-                        prepend-icon="mdi-checkbox-blank-circle-outline"
+                        :prepend-icon="subjectVersionValidityIcon('ValidFrozen')"
                         label="Frozen"
                       ></v-switch>
                     </v-col>
@@ -47,7 +45,7 @@
                         right
                         v-model="showInvalid"
                         color="gray"
-                        prepend-icon="mdi-cancel"
+                        :prepend-icon="subjectVersionValidityIcon('Invalid')"
                         label="Invalid"
                       ></v-switch>
                     </v-col>
@@ -82,13 +80,13 @@
             class="ma-3"
             >
 
-              <template v-slot:item.id="{ item }">
+              <template v-slot:[`item.id`]="{ item }">
                 <router-link :to="{ name: 'Subject', params: { id: item.id, version: item.latest_version }}">
                 {{item.id}}
                 </router-link>
                         
               </template>
-              <template v-slot:item.versions="{ item }">
+              <template v-slot:[`item.versions`]="{ item }">
                 <table>
                   <tr>
                     <td
@@ -102,12 +100,13 @@
                         >
                       <v-chip 
                         class="ma-1" 
-                        :color="subjectVersionColor(version)"
-                        :text-color="subjectVersionTextColor(version)"
+                        :text-color="subjectVersionValidityTextColor(version.validity)"
+                        :color="subjectVersionValidityColor(version.validity)"
+                        
                         :to="{ name: 'Subject', params: { id: item.id, version: version.version }}"
                         outlined
                       >
-                      <v-icon left>{{subjectVersionIcon(version)}}</v-icon>
+                      <v-icon left>{{subjectVersionValidityIcon(version.validity)}}</v-icon>
                         {{ version.version }}
                       </v-chip>
                       </div>
@@ -123,35 +122,35 @@
         <v-tab-item value="Resource">
           <v-card>
             <v-card-title>
-                      <v-text-field
-                        v-model="searchResources"
-                        append-icon="mdi-magnify"
-                        label="Search"
-                        single-line
-                        hide-details
-                      ></v-text-field>
+              <v-text-field
+                v-model="searchResources"
+                append-icon="mdi-magnify"
+                label="Search"
+                single-line
+                hide-details
+              ></v-text-field>
             </v-card-title>
 
               <v-data-table
-              dense
-              hide-default-footer
-              disable-pagination
-              :headers="resourceHeaders"
-              :items="resources"
-              :search="searchResources"
-              item-key="id"
-              sort-by="id"
-              class="elevation-1 ma-3"
+                dense
+                hide-default-footer
+                disable-pagination
+                :headers="resourceHeaders"
+                :items="resources"
+                :search="searchResources"
+                item-key="id"
+                sort-by="id"
+                class="elevation-1 ma-3"
               >
 
-                <template v-slot:item.id="{ item }">
+                <template v-slot:[`item.id`]="{ item }">
                   <router-link :to="{ name: 'Resource', params: { resource_id: item.id, resource_version: item.latest_version }}">
                   {{item.id}}
                   </router-link>
                         
                 </template>
 
-                <template v-slot:item.versions="{ item }">
+                <template v-slot:[`item.versions`]="{ item }">
                   <v-chip 
                     v-for="version in item.versions" 
                     :key="version.id" 
@@ -176,15 +175,14 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import APIClient from '@/logic/Client'
 import { SubjectResource, SubjectVersionValidity, SubjectVersionShortResource} from '@/logic/Resources'
+import { mixins } from 'vue-class-component'
+import SubjectVersionValidityMixin from './SubjectVersionValidityMixin'
 
 const api = new APIClient()
 
 
-@Component({
-  components: {
-  },
-})
-export default class Home extends Vue {
+@Component
+export default class Home extends mixins(SubjectVersionValidityMixin) {
   private subjects = Array<SubjectResource>()
   private resources = []
   private activeTab = 'Product'
@@ -275,53 +273,6 @@ export default class Home extends Vue {
 
   subjectVersionsByValidity(subjectVersion: SubjectResource, validity: SubjectVersionValidity) {
     return subjectVersion.versions.filter( version => version.validity == validity)
-  }
-
-  subjectVersionColor(subjectVersion: SubjectVersionShortResource) {
-
-    switch(subjectVersion.validity) {
-      case SubjectVersionValidity.Unspecified:
-        return "disabled"
-      case  SubjectVersionValidity.ValidFrozen:
-      case  SubjectVersionValidity.ValidActive:
-        return "primary"
-      case SubjectVersionValidity.Invalid:
-        return "disabled"
-      default:
-        return ""
-    }
-  }
-
-  subjectVersionIcon(subjectVersion: SubjectVersionShortResource) {
-
-    switch(subjectVersion.validity) {
-      case  SubjectVersionValidity.Pending:
-        return "mdi-circle-edit-outline"
-      case  SubjectVersionValidity.ValidActive:
-        return "mdi-check-decagram"
-      case  SubjectVersionValidity.ValidFrozen:
-        return "mdi-checkbox-blank-circle-outline"
-      case  SubjectVersionValidity.Unspecified:
-        return "mdi-help-circle-outline"
-      case SubjectVersionValidity.Invalid:
-        return "mdi-cancel"
-      default:
-        return ""
-    }
-  }
-
-  subjectVersionTextColor(subjectVersion: SubjectVersionShortResource) {
-
-    switch(subjectVersion.validity) {
-      case  SubjectVersionValidity.Pending:
-        return "orange"
-      case  SubjectVersionValidity.Unspecified:
-        return "grey"
-      case  SubjectVersionValidity.Invalid:
-        return "grey"
-      default:
-        return ""
-    }
   }
 
   activeValidities() {

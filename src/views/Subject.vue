@@ -15,13 +15,14 @@
             </div>
             <div>
                 <v-chip
-                    v-for="version in versions" 
-                    :key="version"
-                    :to="{ name: 'Subject', params: { id: subject.subject_id, version: version }}"
-                    class="ma-2"
+                    v-for="version in subject.versions" 
+                    :key="version.version"
+                    :to="{ name: 'Subject', params: { id: subject.subject_id, version: version.version }}"
                     active-class="primary"
+                    class="ma-2"
                 >
-                    {{version}}
+                 <v-icon left>{{subjectVersionValidityIcon(version.validity)}}</v-icon>
+                    {{version.version}}
                 </v-chip>
             </div>
 
@@ -30,7 +31,9 @@
                     <v-col cols="3">
                         <v-select
                             v-model="subject.version"
-                            :items="versions"
+                            :items="subject.versions"
+                            item-text="version"
+                            item-value="version"                            
                             menu-props="auto"
                             label="Select version"
                             hide-details
@@ -43,7 +46,9 @@
                     <v-col cols="3">
                         <v-select
                             v-model="compareVersion"
-                            :items="versions"
+                            :items="subject.versions"
+                            item-text="version"
+                            item-value="version"                            
                             menu-props="auto"
                             label="Select version"
                             hide-details
@@ -74,7 +79,7 @@
             @click:row="onClickResourceReference"
             >
             
-                <template v-slot:item.requirements_count="{ item }">
+                <template v-slot:[`item.requirements_count`]="{ item }">
                 <v-chip
                     class="ma-2 pill"
                     color="orange"
@@ -89,14 +94,14 @@
                 </v-chip>
                 </template>
 
-                <template v-slot:item.resource.title="{ item }">
+                <template v-slot:[`item.resource.title`]="{ item }">
                     <span>{{ item.resource.title }}</span>
                 </template>
-                <template v-slot:item.resource.id="{ item }">
+                <template v-slot:[`item.resource.id`]="{ item }">
                     <a v-if="item.url.startsWith('http')" target="_blank" :href="item.url">{{ item.resource.id }}</a>
                     <span v-else>{{ item.resource.id }}</span>
                 </template>
-                <template v-slot:item.version="{ item }">
+                <template v-slot:[`item.version`]="{ item }">
                     <span :class="{'RemovedVersion': item.diff && item.diff.type == 'Removed'}">{{item.version}}</span>
                     <span v-if="item.diff && item.diff.changes && item.diff.changes.version" class="RemovedVersion"> {{item.diff.changes.version}}</span>
                 </template>
@@ -117,20 +122,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Vue, Watch } from 'vue-property-decorator';
 import APIClient from '@/logic/Client'
 import { ReferenceShortResource, SubjectVersionResource } from '@/logic/Resources'
+import SubjectVersionValidityMixin from './SubjectVersionValidityMixin';
 
 const api = new APIClient()
 
-@Component({
-  components: {
-  },
-})
-export default class SubjectView extends Vue {
+@Component
+export default class SubjectView extends Mixins(SubjectVersionValidityMixin) { 
     private searchResources = ""
     private subject: SubjectVersionResource | null = null
-    private versions: string[] = []
     private compareVersion?: string
 
     private resourcesHeaders = [  {
@@ -157,9 +159,9 @@ export default class SubjectView extends Vue {
         this.compareVersion = this.$route.query.compare as string
         api.getSubjectVersion(this.$route.params.id, this.$route.params.version, this.compareVersion).then((response) => {
             this.subject = response.data
-            if (this.subject != null) {
-                this.versions = this.subject.all_versions.sort()
-            }
+            this.subject!.versions.sort( (a, b) => {
+                return a.version.localeCompare(b.version)
+            })
         })
         .catch((e) => {
             this.$emit('errorOccured', e.message)

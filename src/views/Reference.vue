@@ -10,17 +10,18 @@
             
             <div>
                 <v-chip
-                    v-for="version in versions" 
-                    :key="version"
+                    v-for="version in subject.versions" 
+                    :key="version.version"
                     :to="{ name: 'Reference', params: { 
                         subject_id: reference.subject_id, 
-                        subject_version:  version,
+                        subject_version:  version.version,
                         resource_id: reference.resource.id
                     }}"
                     class="ma-2"
                     active-class="primary"
                 >
-                    {{version}}
+                    <v-icon left>{{subjectVersionValidityIcon(version.validity)}}</v-icon>
+                    {{version.version}}
                 </v-chip>
             </div>
             
@@ -29,7 +30,9 @@
                     <v-col cols="3">
                         <v-select
                             v-model="subject.version"
-                            :items="versions"
+                            :items="subject.versions"
+                            item-text="version"
+                            item-value="version"                            
                             menu-props="auto"
                             label="Select version"
                             hide-details
@@ -42,7 +45,9 @@
                     <v-col cols="3">
                         <v-select
                             v-model="compareVersion"
-                            :items="versions"
+                            :items="subject.versions"
+                            item-text="version"
+                            item-value="version"                            
                             menu-props="auto"
                             label="Select version"
                             hide-details
@@ -105,19 +110,17 @@
 
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Vue, Watch } from 'vue-property-decorator';
 import APIClient from '@/logic/Client'
+import { SubjectVersionResource } from '@/logic/Resources';
+import SubjectVersionValidityMixin from './SubjectVersionValidityMixin';
 
 const api = new APIClient()
 
-@Component({
-  components: {
-  },
-})
-export default class ReferenceView extends Vue {
-    private subject: any = null
+@Component
+export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
+    private subject: SubjectVersionResource | null = null
     private reference: any = null
-    private versions: string[] = []
     private selectedReference = ""
     private compareVersion?: string
     @Watch('$route', { immediate: true, deep: true })
@@ -130,10 +133,12 @@ export default class ReferenceView extends Vue {
             this.$route.params.subject_version
         ).then((response) => {
             this.subject = response.data
-            this.versions = this.subject.all_versions.sort()
+            this.subject!.versions.sort( (a, b) => {
+                return a.version.localeCompare(b.version)
+            })
             return api.getReference(
-            this.subject.subject_id, 
-            this.subject.version, 
+            this.subject!.subject_id, 
+            this.subject!.version, 
             this.$route.params.resource_id,
             this.compareVersion)
         })
@@ -156,7 +161,7 @@ export default class ReferenceView extends Vue {
           to: '/',
         })
         items.push({
-          text: this.subject.subject_id + " v" + this.subject.version,
+          text: this.subject!.subject_id + " v" + this.subject!.version,
           exact: true,
           to: 
             {
@@ -199,12 +204,12 @@ export default class ReferenceView extends Vue {
 
     compare() {
         if (this.$route.query['compare'] != this.compareVersion 
-            || this.subject.version != this.$route.params.subject_version) {
+            || this.subject!.version != this.$route.params.subject_version) {
             this.$router.push({ 
                 name: 'Reference', 
                 params: { 
-                    'subject_id': this.subject.subject_id, 
-                    'subject_version': this.subject.version,
+                    'subject_id': this.subject!.subject_id, 
+                    'subject_version': this.subject!.version,
                     'resource_id': this.reference.resource.id,
                 },
                 query: {    
