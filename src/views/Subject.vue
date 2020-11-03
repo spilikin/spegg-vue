@@ -2,22 +2,22 @@
 
     <div class="pa-3">
         <v-skeleton-loader
-            v-if="subject == null"
+            v-if="subjectVersion == null"
             type="list-item-avatar, divider, list-item-three-line, card-heading, image, actions"
         ></v-skeleton-loader>
-        <div v-if="subject">
+        <div v-if="subjectVersion">
             <v-breadcrumbs
                 :items="breadcrumbs()"
                 divider="/"
             ></v-breadcrumbs>
             <div>
-                <span class="text-h4">{{subject.title}}</span>
+                <span class="text-h4">{{subjectVersion.subject.title}}</span>
             </div>
             <div>
                 <v-chip
-                    v-for="version in subject.versions" 
+                    v-for="version in subjectVersion.versions" 
                     :key="version.version"
-                    :to="{ name: 'Subject', params: { id: subject.subject_id, version: version.version }}"
+                    :to="{ name: 'Subject', params: { id: subjectVersion.subject.id, version: version.version }}"
                     active-class="primary"
                     class="ma-2"
                 >
@@ -30,8 +30,8 @@
                 <v-row>
                     <v-col cols="3">
                         <v-select
-                            v-model="subject.version"
-                            :items="subject.versions"
+                            v-model="subjectVersion.version"
+                            :items="subjectVersion.versions"
                             item-text="version"
                             item-value="version"                            
                             menu-props="auto"
@@ -46,7 +46,7 @@
                     <v-col cols="3">
                         <v-select
                             v-model="compareVersion"
-                            :items="subject.versions"
+                            :items="subjectVersion.versions"
                             item-text="version"
                             item-value="version"                            
                             menu-props="auto"
@@ -70,11 +70,11 @@
             hide-default-footer
             disable-pagination
             :headers="resourcesHeaders"
-            :items="subject.references"
+            :items="subjectVersion.references"
             :search="searchResources"
             :item-class="referenceClass"
-            item-key="subject_id"
-            sort-by="subject_id"
+            item-key="subject.id"
+            sort-by="subject.id"
             class="elevation-1 ma-3"
             @click:row="onClickResourceReference"
             >
@@ -98,7 +98,7 @@
                     <span>{{ item.resource.title }}</span>
                 </template>
                 <template v-slot:[`item.resource.id`]="{ item }">
-                    <a v-if="item.url.startsWith('http')" target="_blank" :href="item.url">{{ item.resource.id }}</a>
+                    <a v-if="item.url != null" target="_blank" :href="item.url">{{ item.resource.id }}</a>
                     <span v-else>{{ item.resource.id }}</span>
                 </template>
                 <template v-slot:[`item.version`]="{ item }">
@@ -132,7 +132,7 @@ const api = new APIClient()
 @Component
 export default class SubjectView extends Mixins(SubjectVersionValidityMixin) { 
     private searchResources = ""
-    private subject: SubjectVersionResource | null = null
+    private subjectVersion: SubjectVersionResource | null = null
     private compareVersion?: string
 
     private resourcesHeaders = [  {
@@ -155,11 +155,11 @@ export default class SubjectView extends Mixins(SubjectVersionValidityMixin) {
 
     @Watch('$route', { immediate: true, deep: true })
     onRoute() {
-        this.subject = null
+        this.subjectVersion = null
         this.compareVersion = this.$route.query.compare as string
         api.getSubjectVersion(this.$route.params.id, this.$route.params.version, this.compareVersion).then((response) => {
-            this.subject = response.data
-            this.subject!.versions.sort( (a, b) => {
+            this.subjectVersion = response.data
+            this.subjectVersion!.versions.sort( (a, b) => {
                 return a.version.localeCompare(b.version)
             })
         })
@@ -175,20 +175,20 @@ export default class SubjectView extends Mixins(SubjectVersionValidityMixin) {
           text: 'Home',
           to: '/',
         })
-        if (this.subject != null) {
+        if (this.subjectVersion != null) {
             items.push({
-            text: this.subject.subject_id,
-            to: '/Subject/'+this.subject.subject_id,
+            text: this.subjectVersion.subject.id,
+            to: '/Subject/'+this.subjectVersion.subject.id,
             })
         }
         return items;
     }
 
   compare() {
-      if (this.subject != null && this.$route.query['compare'] != this.compareVersion) {
+      if (this.subjectVersion != null && this.$route.query['compare'] != this.compareVersion) {
         this.$router.push({
             name: 'Subject', 
-            params: {'subject_id': this.subject['subject_id'], version: this.subject.version}, 
+            params: {'subject_id': this.subjectVersion.subject.id, version: this.subjectVersion.version}, 
             query: {compare: this.compareVersion}})    
       }
   }
@@ -206,13 +206,13 @@ export default class SubjectView extends Mixins(SubjectVersionValidityMixin) {
   }
 
   onClickResourceReference(reference: ReferenceShortResource ) {
-    if (this.subject == null) return;
+    if (this.subjectVersion == null) return;
     if ( (reference.diff && (reference.diff.type == 'Removed' || reference.diff.type == 'Added') ) ) return;
     const link = { 
         name: 'Reference', 
         params: {
-            'subject_id': this.subject.subject_id, 
-            'subject_version':  this.subject.version,
+            'subject_id': this.subjectVersion.subject.id, 
+            'subject_version':  this.subjectVersion.version,
             'resource_id': reference.resource.id
         },
         query: {

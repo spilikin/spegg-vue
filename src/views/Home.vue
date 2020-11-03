@@ -16,36 +16,36 @@
                     <v-col>        
                       <v-switch
                         :prepend-icon="subjectVersionValidityIcon('Pending')"
+                        :color="subjectVersionValidityTextColor('Pending')"
                         right
                         v-model="showPending"
-                        color="orange"
                         label="Pending"
                       ></v-switch>
                     </v-col>
                     <v-col>
                       <v-switch
+                        :prepend-icon="subjectVersionValidityIcon('ValidActive')"
+                        :color="subjectVersionValidityTextColor('ValidActive')"
                         right
                         v-model="showValidActive"
-                        color="blue"
-                        :prepend-icon="subjectVersionValidityIcon('ValidActive')"
                         label="Active"
                       ></v-switch>
                     </v-col>
                     <v-col>
                       <v-switch
+                        :prepend-icon="subjectVersionValidityIcon('ValidFrozen')"
+                        :color="subjectVersionValidityTextColor('ValidFrozen')"
                         right
                         v-model="showValidFrozen"
-                        color="blue"
-                        :prepend-icon="subjectVersionValidityIcon('ValidFrozen')"
                         label="Frozen"
                       ></v-switch>
                     </v-col>
                     <v-col>
                       <v-switch
+                        :prepend-icon="subjectVersionValidityIcon('Invalid')"
+                        :color="subjectVersionValidityTextColor('Invalid')"
                         right
                         v-model="showInvalid"
-                        color="gray"
-                        :prepend-icon="subjectVersionValidityIcon('Invalid')"
                         label="Invalid"
                       ></v-switch>
                     </v-col>

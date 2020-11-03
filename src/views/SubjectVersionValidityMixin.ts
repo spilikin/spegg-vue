@@ -31,9 +31,9 @@ export default class SubjectVersionValidityMixin extends Vue {
       case  SubjectVersionValidity.ValidFrozen:
         return "primary"
       case SubjectVersionValidity.Invalid:
-        return "disabled"
+        return "blue-grey darken-3"
       case  SubjectVersionValidity.Unspecified:
-        return "disabled"
+        return "blue-grey darken-3"
       default:
         return ""
     }
@@ -45,10 +45,14 @@ export default class SubjectVersionValidityMixin extends Vue {
     switch(subjectValidity) {
       case  SubjectVersionValidity.Pending:
         return "orange"
+      case  SubjectVersionValidity.ValidActive:
+        return "primary"
+      case  SubjectVersionValidity.ValidFrozen:
+        return "primary"
+      case SubjectVersionValidity.Invalid:
+        return "blue-grey darken-3"
       case  SubjectVersionValidity.Unspecified:
-        return "grey"
-      case  SubjectVersionValidity.Invalid:
-        return "grey"
+        return "blue-grey darken-3"
       default:
         return ""
     }

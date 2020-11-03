@@ -28,7 +28,7 @@
             :headers="subjectsHeaders"
             :items="resource.referenced_by_subjects"
             :search="searchSubjects"
-            sort-by="subject_id"
+            sort-by="subject.id"
             class="elevation-1 ma-3"
             @click:row="onClickSubjectReference"
             >
@@ -55,11 +55,11 @@ export default class ReferenceView extends Vue {
     private searchSubjects = ""
     private subjectsHeaders = [  {
           text: 'Referred by',
-          value: 'title',
+          value: 'subject.title',
         },
         {
           text: 'Subject',
-          value: 'subject_id',
+          value: 'subject.id',
         },
         {
           text: 'Version',
@@ -105,8 +105,8 @@ export default class ReferenceView extends Vue {
         return items;
     }
 
-    onClickSubjectReference(subject: SubjectReferenceResource) {
-        this.$router.push({ name: 'Subject', params: { id: subject.subject_id, version: subject.version }})
+    onClickSubjectReference(subjectReference: SubjectReferenceResource) {
+        this.$router.push({ name: 'Subject', params: { id: subjectReference.subject.id, version: subjectReference.version }})
     }
 }
 </script>

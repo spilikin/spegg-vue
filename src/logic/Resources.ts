@@ -38,11 +38,15 @@ export enum SubjectType {
     Requirements = 'Requirements',
 }
 
-export interface SubjectVersionResource {
-    subject_id: string;
-    version: string;
+export interface SubjectShortResource {
+    id: string;
     title: string;
     type: SubjectType;
+}
+
+export interface SubjectVersionResource {
+    subject: SubjectShortResource;
+    version: string;
     validity: SubjectVersionValidity;
     references: Array<ReferenceShortResource>;
     versions: Array<SubjectVersionShortResource>;
@@ -78,10 +82,8 @@ export interface ResourceVersion {
 }
 
 export interface SubjectReferenceResource {
-    subject_id: string;
+    subject: SubjectShortResource;
     version: string;
-    validity: SubjectVersionValidity;
-    title: string;
 }
 
 

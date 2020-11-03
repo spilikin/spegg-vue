@@ -10,7 +10,7 @@
             
             <div>
                 <v-chip
-                    v-for="version in subject.versions" 
+                    v-for="version in subjectVersion.versions" 
                     :key="version.version"
                     :to="{ name: 'Reference', params: { 
                         subject_id: reference.subject_id, 
@@ -29,8 +29,8 @@
                 <v-row>
                     <v-col cols="3">
                         <v-select
-                            v-model="subject.version"
-                            :items="subject.versions"
+                            v-model="subjectVersion.version"
+                            :items="subjectVersion.versions"
                             item-text="version"
                             item-value="version"                            
                             menu-props="auto"
@@ -45,7 +45,7 @@
                     <v-col cols="3">
                         <v-select
                             v-model="compareVersion"
-                            :items="subject.versions"
+                            :items="subjectVersion.versions"
                             item-text="version"
                             item-value="version"                            
                             menu-props="auto"
@@ -119,7 +119,7 @@ const api = new APIClient()
 
 @Component
 export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
-    private subject: SubjectVersionResource | null = null
+    private subjectVersion: SubjectVersionResource | null = null
     private reference: any = null
     private selectedReference = ""
     private compareVersion?: string
@@ -132,13 +132,13 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
             this.$route.params.subject_id, 
             this.$route.params.subject_version
         ).then((response) => {
-            this.subject = response.data
-            this.subject!.versions.sort( (a, b) => {
+            this.subjectVersion = response.data
+            this.subjectVersion!.versions.sort( (a, b) => {
                 return a.version.localeCompare(b.version)
             })
             return api.getReference(
-            this.subject!.subject_id, 
-            this.subject!.version, 
+            this.subjectVersion!.subject.id, 
+            this.subjectVersion!.version, 
             this.$route.params.resource_id,
             this.compareVersion)
         })
@@ -161,7 +161,7 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
           to: '/',
         })
         items.push({
-          text: this.subject!.subject_id + " v" + this.subject!.version,
+          text: this.subjectVersion!.subject.id + " v" + this.subjectVersion!.version,
           exact: true,
           to: 
             {
@@ -183,13 +183,7 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
     }
 
     references() {
-
-        if (this.subject == null) {
-            return []
-        }
-        
-
-        return this.subject.references.map( (ref: any) => { 
+        return this.subjectVersion!.references.map( (ref: any) => { 
             return {
                 value: ref.resource.id,
                 text: `${ref.resource.id} - ${ref.resource.title}`
@@ -204,12 +198,12 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
 
     compare() {
         if (this.$route.query['compare'] != this.compareVersion 
-            || this.subject!.version != this.$route.params.subject_version) {
+            || this.subjectVersion!.version != this.$route.params.subject_version) {
             this.$router.push({ 
                 name: 'Reference', 
                 params: { 
-                    'subject_id': this.subject!.subject_id, 
-                    'subject_version': this.subject!.version,
+                    'subject_id': this.subjectVersion!.subject.id, 
+                    'subject_version': this.subjectVersion!.version,
                     'resource_id': this.reference.resource.id,
                 },
                 query: {    
@@ -225,11 +219,11 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
         } else if (req.diff == null) {
             return ''
         } else if (req.diff.type == 'Removed' ) {
-            return 'red lighten-5 Removed'
+            return 'RemovedRequirement'
         } else if (req.diff.type == 'Changed' ) {
-            return 'yellow lighten-4 Changed'
+            return 'ChangedRequirement'
         } else if (req.diff.type == 'Added' ) {
-            return 'green lighten-4'
+            return 'AddedRequirement'
         }
     }
 
@@ -253,6 +247,18 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
 <style scoped>
 .RemovedText {
     color: red;
-    text-decoration: line-through;
+    background-color: #FFCDD2;
+}
+.RemovedRequirement {
+    border-left: 15px #F44336 solid;
+    background-color: #FFCDD2;
+}
+.ChangedRequirement {
+    border-left: 15px #FFD600 solid;
+    background-color: #FFF9C4;
+}
+.AddedRequirement {
+    border-left: 15px #4CAF50 solid;
+    background-color: #C8E6C9;
 }
 </style>
