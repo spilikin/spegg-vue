@@ -156,7 +156,7 @@ export default class SubjectView extends Mixins(SubjectVersionValidityMixin) {
     @Watch('$route', { immediate: true, deep: true })
     onRoute() {
         this.subjectVersion = null
-        this.compareVersion = this.$route.query.compare as string
+        this.compareVersion = this.$route.query.compare_version as string
         api.getSubjectVersion(this.$route.params.id, this.$route.params.version, this.compareVersion).then((response) => {
             this.subjectVersion = response.data
             this.subjectVersion!.versions.sort( (a, b) => {
@@ -185,11 +185,11 @@ export default class SubjectView extends Mixins(SubjectVersionValidityMixin) {
     }
 
   compare() {
-      if (this.subjectVersion != null && this.$route.query['compare'] != this.compareVersion) {
+      if (this.subjectVersion != null && this.$route.query['compare_version'] != this.compareVersion) {
         this.$router.push({
             name: 'Subject', 
             params: {'subject_id': this.subjectVersion.subject.id, version: this.subjectVersion.version}, 
-            query: {compare: this.compareVersion}})    
+            query: {'compare_version': this.compareVersion}})    
       }
   }
 
@@ -216,7 +216,7 @@ export default class SubjectView extends Mixins(SubjectVersionValidityMixin) {
             'resource_id': reference.resource.id
         },
         query: {
-            compare: this.compareVersion
+            'compare_version': this.compareVersion
         }
     }
     this.$router.push(link)
