@@ -135,7 +135,7 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
     private compareSubject?: SubjectResource
     private compareSubjectId?: string
     private compareResourceId?: string
-    private panel = []
+    private panel: Array<number> = []
 
     @Watch('$route', { immediate: true, deep: true })
     onRoute() {
