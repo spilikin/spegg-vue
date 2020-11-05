@@ -167,10 +167,6 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
         })
         .then((response) => {
             this.reference = response.data;
-            this.$nextTick(() => {
-                this.goto(this.anchor())
-            });
-
             return api.getAllSubjects()
         })
         .then((response) => {
@@ -186,9 +182,12 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
                     this.compareSubject = subject
                     this.compareSubjectId = subject.id
                 }
-          })
-          this.updateCompareVersions()
-          this.loaded = true
+            })
+            this.updateCompareVersions()
+            this.loaded = true
+            this.$nextTick(() => {
+                this.goto(this.anchor())
+            });
         })
         .catch((e) => {
             this.$emit('errorOccured', e.message)
