@@ -25,7 +25,7 @@
                 </v-chip>
             </div>
             
-            <v-expansion-panels multiple  v-model="panel">
+            <v-expansion-panels multiple v-model="panel">
                 <v-expansion-panel>
                     <v-expansion-panel-header class="text-h6">Resource</v-expansion-panel-header>
                     <v-expansion-panel-content>
@@ -38,7 +38,6 @@
                                         solo
                                         v-model="selectedReference"
                                         v-on:change="changeReference"                
-
                                     ></v-select>
                                     Link: <a target="_blank" :href="reference.url">{{reference.resource.id}} v{{reference.version}}</a>
                                 </v-col>
