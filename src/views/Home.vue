@@ -78,13 +78,11 @@
             item-key="id"
             sort-by="id"
             class="ma-3"
+            @click:row="onClickSubject"
             >
 
               <template v-slot:[`item.id`]="{ item }">
-                <router-link :to="{ name: 'Subject', params: { id: item.id, version: item.latest_version }}">
-                {{item.id}}
-                </router-link>
-                        
+                <span class="font-weight-medium">{{item.id}}</span>
               </template>
               <template v-slot:[`item.versions`]="{ item }">
                 <table>
@@ -285,6 +283,17 @@ export default class Home extends mixins(SubjectVersionValidityMixin) {
       result.push(SubjectVersionValidity.Unspecified)
     }
     return result
+  }
+
+  onClickSubject(subject: SubjectResource) {
+    const link = { 
+        name: 'Subject', 
+        params: {
+            'id': subject.id, 
+            'version':  subject.latest_version,
+        },
+    }
+    this.$router.push(link)
   }
 
 }

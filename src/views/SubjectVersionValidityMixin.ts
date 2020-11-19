@@ -11,7 +11,7 @@ export default class SubjectVersionValidityMixin extends Vue {
         case  SubjectVersionValidity.ValidActive:
           return "mdi-check-decagram"
         case  SubjectVersionValidity.ValidFrozen:
-          return "mdi-checkbox-blank-circle-outline"
+          return "mdi-play-circle-outline"
         case SubjectVersionValidity.Invalid:
           return "mdi-cancel"
         case  SubjectVersionValidity.Unspecified:

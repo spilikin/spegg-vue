@@ -24,33 +24,59 @@
                     {{version.version}}
                 </v-chip>
             </div>
-            
-            <v-expansion-panels multiple v-model="panel">
-                <v-expansion-panel>
-                    <v-expansion-panel-header class="text-h6">Resource</v-expansion-panel-header>
-                    <v-expansion-panel-content>
-                        <v-container fluid>
-                            <v-row>
-                                <v-col cols="5">
-                                    <v-select
-                                        :items="references()"
-                                        label="References"
-                                        solo
-                                        v-model="selectedReference"
-                                        v-on:change="changeReference"                
-                                    ></v-select>
-                                    Link: <a target="_blank" :href="reference.url">{{reference.resource.id}} v{{reference.version}}</a>
-                                </v-col>
-                            </v-row>
-                            <v-row>
-                                <v-col cols="5" align="center">
-                                    
-                                </v-col>
-                            </v-row>
-                        </v-container>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
+            <v-card>
+            <v-card-text>
+                <div class="d-flex flex-wrap">
+                    <v-card elevation="0" >
+                        <v-card-text>
+                            <div class="fieldLabel">Resource ID</div>
+                            <div class="fieldValue">{{reference.resource.id}}</div>
+                        </v-card-text>
+                    </v-card>
+                    <v-card elevation="0" >
+                        <v-card-text>
+                            <div class="fieldLabel">Version</div>
+                            <div class="fieldValue">{{reference.version}}</div>
+                        </v-card-text>
+                    </v-card>
+                    <v-card elevation="0" >
+                        <v-card-text>
+                            <div class="fieldLabel">Requirements</div>
+                            <div class="fieldValue">{{requirementCount}}/{{totalRequirementCount}}</div>
+                        </v-card-text>
+                    </v-card>
+                    <v-card elevation="0" >
+                        <v-card-text>
+                            <div class="fieldLabel">Subject ID</div>
+                            <div class="fieldValue">{{subjectVersion.subject.id}}</div>
+                        </v-card-text>
+                    </v-card>
+                    <v-card elevation="0" >
+                        <v-card-text>
+                            <div class="fieldLabel">Version</div>
+                            <div class="fieldValue">{{subjectVersion.version}}</div>
+                        </v-card-text>
+                    </v-card>
+                    <v-card elevation="0" >
+                        <v-card-text>
+                            <div class="fieldLabel">Validity</div>
+                            <div class="fieldValue"><v-icon :color="subjectVersionValidityTextColor(subjectVersion.validity)">{{subjectVersionValidityIcon(subjectVersion.validity)}}</v-icon> {{subjectVersion.validity}}</div>
+                        </v-card-text>
+                    </v-card>
+                </div>
+                <div class="d-flex flex-wrap" v-if="reference.url">
+                    <v-card elevation="0">
+                        <v-card-text>
+                            <div class="fieldLabel">URL</div>
+                            <div class="fieldValue"><a target="_new" :href="reference.url">{{reference.url.substring(reference.url.lastIndexOf('/')+1)}}</a></div>
+                        </v-card-text>
+                    </v-card>
+                </div>
 
+            </v-card-text>
+            </v-card>
+
+            <v-expansion-panels multiple v-model="panel">
                 <v-expansion-panel>
                     <v-expansion-panel-header class="text-h6">Compare</v-expansion-panel-header>
                     <v-expansion-panel-content>
@@ -232,10 +258,6 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
 
     }
 
-    changeReference(resourceId: string) {
-        this.$router.push({ params: {'resource_id': resourceId} })
-    }
-
     compare() {
         if (this.$route.query['compare_version'] != this.compareVersion 
             || this.$route.query['compare_subject_id'] != this.compareSubjectId) {
@@ -299,6 +321,14 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
         this.updateCompareVersions()
     }
 
+    get totalRequirementCount(): number { 
+        return this.subjectVersion!.references.map(ref => ref.requirements_count).reduce( (total, count) => total = total + count )
+    }
+
+    get requirementCount(): number { 
+        return this.reference.requirements.length
+    }
+
 }
 </script>
 <style scoped>
@@ -317,5 +347,12 @@ export default class ReferenceView extends Mixins(SubjectVersionValidityMixin) {
 .AddedRequirement {
     border-left: 15px #4CAF50 solid;
     background-color: #C8E6C9;
+}
+.fieldLabel {
+    font-size: 0.8rem;
+}
+.fieldValue {
+    font-size: 1.1rem;
+    font-weight: 500 !important;    
 }
 </style>
