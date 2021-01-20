@@ -1,3 +1,4 @@
+
 export enum DiffType {
     Added = 'Added',
     Removed = 'Removed',
@@ -86,11 +87,21 @@ export interface SubjectReferenceResource {
     version: string;
 }
 
-
 export interface ResourceVersionResource {
     resource_id: string;
     version: string;
     resource: Resource;
     versions: Array<ResourceVersion>;
     referenced_by_subjects: Array<SubjectReferenceResource>;
+}
+
+export interface InfoSubjectTypeResource {
+    type: SubjectType;
+    count: number;
+    versions: number;
+}
+
+export interface InfoResource {
+    version: string;
+    subjects: Array<InfoSubjectTypeResource>;
 }
